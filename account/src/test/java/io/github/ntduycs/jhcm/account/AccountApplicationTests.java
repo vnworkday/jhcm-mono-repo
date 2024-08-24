@@ -11,7 +11,5 @@ class AccountApplicationTests {
 
   @Test
   @DisplayName("should load context")
-  void contextLoads() {
-  }
-
+  void contextLoads() {}
 }
