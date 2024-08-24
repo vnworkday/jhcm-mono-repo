@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <springProperty scope="context" name="appName" source="spring.application.name" />
+
+  <property name="logDir" value="./logs" />
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+      <layout class="io.github.jhcm.base.logging.LogRedactionConfig">
+        <maskPattern>password\"\s*:\s*\"(.*?)\"</maskPattern>
+        <maskPattern>username\"\s*:\s*\"(.*?)\"</maskPattern>
+        <maskPattern>secret\"\s*:\s*\"(.*?)\"</maskPattern>
+        <maskPattern>Secret\"\s*:\s*\"(.*?)\"</maskPattern>
+        <maskPattern>token\"\s*:\s*\"(.*?)\"</maskPattern>
+        <maskPattern>Token\"\s*:\s*\"(.*?)\"</maskPattern>
+        <maskPattern>pin\"\s*:\s*\"(.*?)\"</maskPattern>
+        <maskPattern>Pin\"\s*:\s*\"(.*?)\"</maskPattern>
+        <maskPattern>([\w.-]+@[\w.-]+\.\w+)</maskPattern> <!-- Email pattern -->
+        <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS,UTC} %green([${springAppName}:%thread:%X{traceId}:%X{requestId}]) %highlight(%-5level) %yellow(%C{1}): %msg%n%throwable
+        </pattern>
+      </layout>
+    </encoder>
+  </appender>
+
+  <root level="info">
+    <appender-ref ref="console" />
+  </root>
+</configuration>
