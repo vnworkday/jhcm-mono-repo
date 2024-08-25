@@ -1,8 +1,9 @@
 package io.github.ntduycs.jhcm.account.config;
 
-import org.springframework.context.annotation.ComponentScan;
+import io.github.ntduycs.jhcm.base.domain.DefaultDatasourceConfig;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 @Configuration
-@ComponentScan("io.github.ntduycs.jhcm.base.domain")
+@Import({DefaultDatasourceConfig.class})
 public class DataSourceConfig {}

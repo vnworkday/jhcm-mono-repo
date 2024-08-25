@@ -1,6 +1,9 @@
 spring:
   main:
     banner-mode: off
+  threads:
+    virtual:
+      enabled: true
   profiles:
     default: local
   application:
@@ -45,10 +48,27 @@ management:
         - x-correlation-id
     sampling:
       probability: 1.0
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+    tags:
+      application: ${spring.application.name}
 logging:
   level:
     root: warn
     io.github.ntduycs.jhcm: info
+  http:
+    request:
+      enabled: ${REQUEST_LOG_ENABLED:true}
+      include-headers: ${REQUEST_LOG_INCLUDE_HEADERS:false}
+      ignored-uris:
+        - /actuator/(.*)
+    response:
+      enabled: ${RESPONSE_LOG_ENABLED:true}
+      include-headers: ${RESPONSE_LOG_INCLUDE_HEADERS:false}
+      ignored-uris:
+        - /actuator/(.*)
 ---
 spring:
   config:

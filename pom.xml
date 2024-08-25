@@ -43,7 +43,7 @@
     <mapstruct.version>1.6.0</mapstruct.version>
     <fastjson.version>2.0.52</fastjson.version>
     <mybatis.version>3.0.3</mybatis.version>
-    <springdoc.version>2.6.0</springdoc.version>
+    <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
 
     <!-- Plugin versions -->
     <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
@@ -53,16 +53,6 @@
     <maven-surefire-plugin.version>3.4.0</maven-surefire-plugin.version>
     <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.springdoc</groupId>
-        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>${springdoc.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -144,7 +134,8 @@
     </dependency>
     <dependency>
       <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+      <version>${springdoc-openapi.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.stephenc.jcip</groupId>

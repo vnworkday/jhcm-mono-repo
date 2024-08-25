@@ -1,12 +1,15 @@
 package io.github.ntduycs.jhcm.account.config;
 
+import io.github.ntduycs.jhcm.base.scheduler.DefaultJobRecorder;
 import io.github.ntduycs.jhcm.base.scheduler.DefaultSchedulerConfig;
 import io.github.ntduycs.jhcm.base.scheduler.JobManager;
+import io.github.ntduycs.jhcm.base.scheduler.JobRecorder;
 import java.io.IOException;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.spi.JobFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +19,9 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 @Configuration
 @ConditionalOnProperty(value = "spring.quartz.auto-startup", havingValue = "true")
-@ComponentScan("io.github.ntduycs.jhcm.base.scheduler")
+@ComponentScan("io.github.ntduycs.jhcm.base.scheduler.listener")
 @Slf4j
-public class QuartzSchedulerConfig extends DefaultSchedulerConfig {
+public class SchedulerConfig extends DefaultSchedulerConfig {
 
   @Bean
   public JobFactory jobFactory(ApplicationContext context) {
@@ -49,5 +52,11 @@ public class QuartzSchedulerConfig extends DefaultSchedulerConfig {
     log.info("Registering {} triggers", triggers.size());
 
     return new JobManager(scheduler, jobs, triggers);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(JobRecorder.class)
+  public JobRecorder defaultJobRecorder() {
+    return new DefaultJobRecorder();
   }
 }

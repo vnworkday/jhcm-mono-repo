@@ -10,10 +10,8 @@ import org.quartz.spi.JobFactory;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -68,11 +66,5 @@ public class DefaultSchedulerConfig {
       beanFactory.autowireBean(job);
       return job;
     }
-  }
-
-  @Bean
-  @ConditionalOnMissingBean(JobRecorder.class)
-  public JobRecorder defaultJobRecorder() {
-    return new DefaultJobRecorder();
   }
 }
