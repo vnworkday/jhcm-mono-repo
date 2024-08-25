@@ -98,7 +98,8 @@ public class HttpExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(NoResourceFoundException.class)
-  public Mono<ResponseEntity<ErrorResponse>> handleNoResourceFoundException(NoResourceFoundException ex) {
+  public Mono<ResponseEntity<ErrorResponse>> handleNoResourceFoundException(
+      NoResourceFoundException ex) {
     logError(ex);
 
     return Mono.just(

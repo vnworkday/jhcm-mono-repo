@@ -4,7 +4,7 @@ import static io.github.ntduycs.jhcm.base.logging.LoggingConstant.CORRELATION_ID
 import static io.github.ntduycs.jhcm.base.logging.LoggingConstant.REQUEST_ID;
 
 import io.github.ntduycs.jhcm.base.http.HttpConstant;
-import io.github.ntduycs.jhcm.base.http.HttpLoggingProperties;
+import io.github.ntduycs.jhcm.base.http.HttpProperties;
 import io.github.ntduycs.jhcm.base.http.interceptor.ServerRequestLoggingInterceptor;
 import io.github.ntduycs.jhcm.base.http.interceptor.ServerResponseLoggingInterceptor;
 import java.time.Instant;
@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @RequiredArgsConstructor
 public class ServerLoggingFilter implements WebFilter {
-  private final HttpLoggingProperties properties;
+  private final HttpProperties properties;
 
   @Override
   @NonNull public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
@@ -39,7 +39,8 @@ public class ServerLoggingFilter implements WebFilter {
         .getHeaders()
         .add(HttpConstant.HTTP_HEADER_REQUEST_ID, MDC.get(REQUEST_ID));
 
-    if (!properties.getRequest().isEnabled() && !properties.getResponse().isEnabled()) {
+    if (!properties.getLogging().getRequest().isEnabled()
+        && !properties.getLogging().getResponse().isEnabled()) {
       return chain.filter(exchange);
     }
 
@@ -73,13 +74,14 @@ public class ServerLoggingFilter implements WebFilter {
     }
 
     protected LoggingDecorator(
-        ServerWebExchange delegate, HttpLoggingProperties properties, Instant startTime) {
+        ServerWebExchange delegate, HttpProperties properties, Instant startTime) {
       super(delegate);
       this.loggableRequest =
-          new ServerRequestLoggingInterceptor(delegate.getRequest(), properties.getRequest());
+          new ServerRequestLoggingInterceptor(
+              delegate.getRequest(), properties.getLogging().getRequest());
       this.loggableResponse =
           new ServerResponseLoggingInterceptor(
-              delegate.getResponse(), properties.getResponse(), startTime);
+              delegate.getResponse(), properties.getLogging().getResponse(), startTime);
     }
   }
 }

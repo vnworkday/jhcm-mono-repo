@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.github.ntduycs.jhcm.account.domain.repository.UserRepository">
+
+  <select id="findById" resultType="io.github.ntduycs.jhcm.account.domain.entity.User">
+    SELECT *
+    FROM `user`
+    WHERE `id` = #{id}
+  </select>
+
+  <select id="findByCode" resultType="io.github.ntduycs.jhcm.account.domain.entity.User">
+    SELECT *
+    FROM `user`
+    WHERE `code` = #{code}
+  </select>
+
+  <select id="search" resultType="io.github.ntduycs.jhcm.account.domain.entity.User">
+    SELECT *
+    FROM `user`
+    WHERE TRUE
+    <include refid="searchCriteria" />
+    ORDER BY
+    <include refid="orderSpecifier" />
+    LIMIT #{request.size} OFFSET #{request.offset}
+  </select>
+
+  <select id="findAll" resultType="io.github.ntduycs.jhcm.account.domain.entity.User">
+    SELECT *
+    FROM `user`
+  </select>
+
+  <select id="count" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM `user`
+    WHERE TRUE
+    <include refid="searchCriteria" />
+  </select>
+
+  <select id="countAll" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM `user`
+  </select>
+
+  <sql id="searchCriteria">
+    <if test="request.cifNumber != null and request.cifNumber != ''">
+      AND `cif_number` LIKE CONCAT('%', #{request.cifNumber}, '%')
+    </if>
+    <if test="request.username != null and request.username != ''">
+      AND `username` LIKE CONCAT('%', #{request.username}, '%')
+    </if>
+    <if test="request.name != null and request.name != ''">
+      AND `full_name` LIKE CONCAT('%', #{request.name}, '%')
+    </if>
+    <if test="request.status != null and request.status != ''">
+      AND `status` = #{request.status}
+    </if>
+  </sql>
+
+  <sql id="orderSpecifier">
+    <choose>
+      <when test="request.sort != null and request.sort != '' and request.order != null and request.order != ''">
+        ${request.sort} ${request.order}
+      </when>
+      <otherwise>
+        `created_at` DESC
+      </otherwise>
+    </choose>
+  </sql>
+</mapper>

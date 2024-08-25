@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 public final class HttpConstant {
   public static final String HTTP_HEADER_REQUEST_ID = "X-Request-ID";
   public static final String HTTP_HEADER_CORRELATION_ID = "X-Correlation-ID";
-  public static final String HTTP_HEADER_REQUEST_METHOD = "X-Request-Method";
-  public static final String HTTP_HEADER_REQUEST_PATH = "X-Request-Path";
+
+  public static final int HTTP_REQUEST_DEFAULT_OFFSET = 0;
+  public static final int HTTP_REQUEST_DEFAULT_SIZE = 10;
+  public static final String HTTP_REQUEST_DEFAULT_SORT = "update_at";
+  public static final String HTTP_REQUEST_DEFAULT_ORDER = "desc";
 }

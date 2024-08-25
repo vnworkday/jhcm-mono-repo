@@ -2,7 +2,7 @@ package io.github.ntduycs.jhcm.base.http.interceptor;
 
 import static io.github.ntduycs.jhcm.base.logging.LoggingConstant.REQUEST_ID;
 
-import io.github.ntduycs.jhcm.base.http.HttpLoggingProperties;
+import io.github.ntduycs.jhcm.base.http.HttpProperties;
 import io.github.ntduycs.jhcm.base.http.interceptor.model.CaseInsensitiveHeaders;
 import io.github.ntduycs.jhcm.base.util.JsonUtils;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +22,7 @@ public class ServerRequestLoggingInterceptor extends ServerHttpRequestDecorator 
   private final Flux<DataBuffer> rawBody;
 
   public ServerRequestLoggingInterceptor(
-      ServerHttpRequest delegate, HttpLoggingProperties.Request properties) {
+      ServerHttpRequest delegate, HttpProperties.Logging.Request properties) {
     super(delegate);
 
     var path = delegate.getURI().getPath();

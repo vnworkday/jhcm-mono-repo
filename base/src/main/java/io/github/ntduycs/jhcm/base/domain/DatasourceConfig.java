@@ -1,6 +1,8 @@
 package io.github.ntduycs.jhcm.base.domain;
 
 import javax.sql.DataSource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.autoconfigure.quartz.QuartzDataSource;
@@ -10,7 +12,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
-public class DefaultDatasourceConfig {
+@Slf4j
+public class DatasourceConfig implements InitializingBean {
 
   @Bean
   @ConfigurationProperties(prefix = "spring.datasource.main")
@@ -36,5 +39,10 @@ public class DefaultDatasourceConfig {
   @ConditionalOnProperty(value = "spring.quartz.auto-startup", havingValue = "true")
   public DataSource quartzDataSource() {
     return quartzDataSourceProperties().initializeDataSourceBuilder().build();
+  }
+
+  @Override
+  public void afterPropertiesSet() {
+    log.debug("========== Datasource initialized ==========");
   }
 }

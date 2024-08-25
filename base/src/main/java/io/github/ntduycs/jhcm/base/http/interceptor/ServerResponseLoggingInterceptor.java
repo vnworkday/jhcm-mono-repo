@@ -2,7 +2,7 @@ package io.github.ntduycs.jhcm.base.http.interceptor;
 
 import static io.github.ntduycs.jhcm.base.logging.LoggingConstant.REQUEST_ID;
 
-import io.github.ntduycs.jhcm.base.http.HttpLoggingProperties;
+import io.github.ntduycs.jhcm.base.http.HttpProperties;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,7 +21,7 @@ public class ServerResponseLoggingInterceptor extends ServerHttpResponseDecorato
   private final StringBuilder responseBody = new StringBuilder();
 
   public ServerResponseLoggingInterceptor(
-      ServerHttpResponse delegate, HttpLoggingProperties.Response properties, Instant startTime) {
+      ServerHttpResponse delegate, HttpProperties.Logging.Response properties, Instant startTime) {
     super(delegate);
 
     delegate.beforeCommit(

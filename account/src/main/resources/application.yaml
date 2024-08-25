@@ -29,7 +29,7 @@ spring:
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-handlers-package: io.github.ntduycs.account.domain.handler,io.github.ntduycs.base.domain.handler
-  type-aliases-package: io.github.ntduycs.account.domain.entity
+  type-aliases-package: io.github.ntduycs.account.domain.Lp]p]
   configuration:
     map-underscore-to-camel-case: true
     use-generated-keys: true
@@ -58,17 +58,22 @@ logging:
   level:
     root: warn
     io.github.ntduycs.jhcm: info
-  http:
+http:
+  read-timeout: ${HTTP_READ_TIMEOUT:10000}
+  write-timeout: ${HTTP_WRITE_TIMEOUT:10000}
+  logging:
     request:
-      enabled: ${REQUEST_LOG_ENABLED:true}
-      include-headers: ${REQUEST_LOG_INCLUDE_HEADERS:false}
+      enabled: ${HTTP_REQUEST_LOG_ENABLED:true}
+      include-headers: ${HTTP_REQUEST_LOG_INCLUDE_HEADERS:false}
       ignored-uris:
         - /actuator/(.*)
     response:
-      enabled: ${RESPONSE_LOG_ENABLED:true}
-      include-headers: ${RESPONSE_LOG_INCLUDE_HEADERS:false}
+      enabled: ${HTTP_RESPONSE_LOG_ENABLED:true}
+      include-headers: ${HTTP_RESPONSE_LOG_INCLUDE_HEADERS:false}
       ignored-uris:
         - /actuator/(.*)
+keycloak:
+  enabled: ${KEYCLOAK_ENABLED:true}
 ---
 spring:
   config:
@@ -115,3 +120,5 @@ logging:
   level:
     root: info
     io.github.ntduycs.jhcm: debug
+keycloak:
+  enabled: false
