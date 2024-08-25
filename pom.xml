@@ -27,7 +27,9 @@
       <timezone>+7</timezone>
     </developer>
   </developers>
+
   <modules>
+    <module>account</module>
     <module>base</module>
   </modules>
 
@@ -155,6 +157,10 @@
       <artifactId>spotbugs-annotations</artifactId>
       <version>4.8.6</version>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-quartz</artifactId>
     </dependency>
   </dependencies>
 
@@ -321,12 +327,10 @@
         </configuration>
         <executions>
           <execution>
-            <id>init</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
           </execution>
-          <!-- attached to Maven test phase -->
           <execution>
             <id>report</id>
             <goals>

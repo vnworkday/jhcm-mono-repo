@@ -1,3 +1,97 @@
 spring:
+  main:
+    banner-mode: off
+  profiles:
+    default: local
   application:
     name: account
+  datasource:
+    main:
+      url: ${MAIN_MYSQL_URL}
+      username: ${MAIN_MYSQL_USERNAME}
+      password: ${MAIN_MYSQL_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    quartz:
+      url: ${QUARTZ_MYSQL_URL}
+      username: ${QUARTZ_MYSQL_USERNAME}
+      password: ${QUARTZ_MYSQL_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    validate-migration-naming: true
+    fail-on-missing-locations: true
+  quartz:
+    auto-startup: ${QUARTZ_ENABLED:false}
+    jdbc:
+      initialize-schema: never
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-handlers-package: io.github.ntduycs.account.domain.handler,io.github.ntduycs.base.domain.handler
+  type-aliases-package: io.github.ntduycs.account.domain.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    use-generated-keys: true
+management:
+  info:
+    build.enabled: true
+    git.enabled: true
+  endpoints.web.exposure.include: health, info
+  endpoint.health.show-details: never
+  tracing:
+    baggage:
+      correlation:
+        fields:
+          - x-correlation-id
+      remote-fields:
+        - x-correlation-id
+    sampling:
+      probability: 1.0
+logging:
+  level:
+    root: warn
+    io.github.ntduycs.jhcm: info
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    main:
+      url: jdbc:mysql://localhost:3306/j_account?useSSL=false
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    quartz:
+      url: jdbc:mysql://localhost:3306/j_quartz?useSSL=false
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  quartz:
+    auto-startup: true
+logging:
+  level:
+    root: info
+    io.github.ntduycs.jhcm: debug
+server:
+  port: 9090
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    main:
+      url: jdbc:h2:mem:j_account;DB_CLOSE_DELAY=-1;MODE=MySQL;TIME ZONE=UTC
+      username: root
+      password: root
+      driver-class-name: org.h2.Driver
+    quartz:
+      url: jdbc:h2:mem:j_quartz;DB_CLOSE_DELAY=-1;MODE=MySQL;TIME ZONE=UTC
+      username: root
+      password: root
+      driver-class-name: org.h2.Driver
+  flyway:
+    locations: classpath:db/h2
+logging:
+  level:
+    root: info
+    io.github.ntduycs.jhcm: debug
