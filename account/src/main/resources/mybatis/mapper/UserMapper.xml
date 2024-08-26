@@ -62,7 +62,7 @@
         ${request.sort} ${request.order}
       </when>
       <otherwise>
-        `created_at` DESC
+        `updated_at` DESC
       </otherwise>
     </choose>
   </sql>

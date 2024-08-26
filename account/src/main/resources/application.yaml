@@ -28,8 +28,8 @@ spring:
       initialize-schema: never
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
-  type-handlers-package: io.github.ntduycs.account.domain.handler,io.github.ntduycs.base.domain.handler
-  type-aliases-package: io.github.ntduycs.account.domain.Lp]p]
+  type-handlers-package: io.github.ntduycs.account.domain.handler,io.github.ntduycs.jhcm.base.domain.handler
+  type-aliases-package: io.github.ntduycs.account.domain.entity
   configuration:
     map-underscore-to-camel-case: true
     use-generated-keys: true

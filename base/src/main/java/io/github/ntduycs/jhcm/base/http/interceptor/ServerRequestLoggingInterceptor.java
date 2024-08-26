@@ -6,6 +6,8 @@ import io.github.ntduycs.jhcm.base.http.HttpProperties;
 import io.github.ntduycs.jhcm.base.http.interceptor.model.CaseInsensitiveHeaders;
 import io.github.ntduycs.jhcm.base.util.JsonUtils;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -18,7 +20,7 @@ import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Flux;
 
 @Slf4j
-public class ServerRequestLoggingInterceptor extends ServerHttpRequestDecorator {
+public final class ServerRequestLoggingInterceptor extends ServerHttpRequestDecorator {
   private final Flux<DataBuffer> rawBody;
 
   public ServerRequestLoggingInterceptor(
@@ -27,16 +29,11 @@ public class ServerRequestLoggingInterceptor extends ServerHttpRequestDecorator 
 
     var path = delegate.getURI().getPath();
 
-    if (properties.getIgnoredUris() != null) {
-      for (var ignoredUri : properties.getIgnoredUris()) {
-        if (path.matches(ignoredUri)) {
-          this.rawBody = super.getBody();
-          return;
-        }
-      }
-    }
+    var shouldSkip =
+        Optional.ofNullable(properties.getIgnoredUris()).orElse(List.of()).stream()
+            .anyMatch(path::matches);
 
-    if (properties.isEnabled()) {
+    if (properties.isEnabled() && !shouldSkip) {
       var method = delegate.getMethod().name();
       var requestId = MDC.get(REQUEST_ID);
       log.info("<== Request: [{}] {} - {}", requestId, method, path);
