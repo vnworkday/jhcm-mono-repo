@@ -13,6 +13,8 @@ public interface TitleRepository {
 
   Optional<Title> findByCode(@Param("code") String code);
 
+  Optional<Title> findByName(@Param("name") String name);
+
   List<Title> findAll();
 
   List<Title> search(@Param("request") ListTitleRequest request);
@@ -20,4 +22,6 @@ public interface TitleRepository {
   Integer countAll();
 
   Integer count(@Param("request") ListTitleRequest request);
+
+  Integer insert(Title title);
 }

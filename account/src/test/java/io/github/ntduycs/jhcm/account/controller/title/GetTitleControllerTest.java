@@ -16,10 +16,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @Sql(
-    scripts = {"/db/sql/cleanup.sql", "/db/sql/title/titles.sql"},
-    executionPhase = BEFORE_TEST_CLASS)
+  scripts = {"/db/sql/cleanup.sql", "/db/sql/title/titles.sql"},
+  executionPhase = BEFORE_TEST_CLASS)
 public class GetTitleControllerTest {
-  @Autowired private WebTestClient mockMvc;
+  @Autowired
+  private WebTestClient mockMvc;
 
   private WebTestClient.ResponseSpec callGetTitleApi(String code) {
     return mockMvc.get().uri("/titles/{code}", code).exchange();
@@ -29,23 +30,23 @@ public class GetTitleControllerTest {
   @DisplayName("should return 200 when title exists")
   void shouldReturn200WhenTitleExists() {
     callGetTitleApi("title1")
-        .expectStatus()
-        .isOk()
-        .expectBody()
-        .jsonPath("$.code")
-        .isEqualTo("title1");
+      .expectStatus()
+      .isOk()
+      .expectBody()
+      .jsonPath("$.code")
+      .isEqualTo("title1");
   }
 
   @Test
   @DisplayName("should return 404 when title does not exist")
   void shouldReturn404WhenTitleDoesNotExist() {
     callGetTitleApi("title999")
-        .expectStatus()
-        .isNotFound()
-        .expectBody()
-        .jsonPath("$.errors")
-        .isNotEmpty()
-        .jsonPath("$.errors[0].code")
-        .isEqualTo(HttpError.NOT_FOUND.getCode());
+      .expectStatus()
+      .isNotFound()
+      .expectBody()
+      .jsonPath("$.errors")
+      .isNotEmpty()
+      .jsonPath("$.errors[0].code")
+      .isEqualTo(HttpError.NOT_FOUND.getCode());
   }
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -104,7 +105,16 @@ public class HttpExceptionHandler extends ResponseEntityExceptionHandler {
 
     return Mono.just(
         new ResponseEntity<>(
-            new ErrorResponse(HttpError.NOT_FOUND, ex.getMessage()), HttpStatus.NOT_FOUND));
+            new ErrorResponse(HttpError.NOT_FOUND, ex.getMessage()), HttpErrorMapper.fromError(HttpError.NOT_FOUND)));
+  }
+
+  @ExceptionHandler(DuplicateKeyException.class)
+  public Mono<ResponseEntity<ErrorResponse>> handleDuplicateKeyException(DuplicateKeyException ex) {
+    logError(ex);
+
+    return Mono.just(
+        new ResponseEntity<>(
+            new ErrorResponse(HttpError.ALREADY_EXISTS, ex.getMessage()), HttpErrorMapper.fromError(HttpError.ALREADY_EXISTS)));
   }
 
   private void logError(Exception ex) {

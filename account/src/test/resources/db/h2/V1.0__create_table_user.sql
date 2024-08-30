@@ -5,13 +5,13 @@ CREATE TABLE `sequence`
   PRIMARY KEY (`name`)
 );
 
-CREATE ALIAS generate_user_code AS
+CREATE ALIAS get_next_sequence_value AS
 $$
   int get_next_sequence_value(String name) {
     int randomNumber;
     String url = "jdbc:h2:mem:j_account;DB_CLOSE_DELAY=-1;MODE=MySQL";
-    String user = "sa";
-    String password = "sa";
+    String user = "root";
+    String password = "root";
     java.sql.Connection conn = null;
     java.sql.PreparedStatement checkAndUpdateStmt = null;
     java.sql.PreparedStatement selectStmt = null;
@@ -19,42 +19,42 @@ $$
     try {
       conn = java.sql.DriverManager.getConnection(url, user, password);
 
-// Attempt to update the sequence value, inserting if not exists
-                checkAndUpdateStmt = conn.prepareStatement(
-                "MERGE INTO sequence (name, value) " +
-                "KEY (name) " +
-                "VALUES (?, COALESCE((SELECT value FROM sequence WHERE name = ?) + 1, 1))"
-                );
-checkAndUpdateStmt.setString(1, "user_code");
+      // Attempt to update the sequence value, inserting if not exists
+      checkAndUpdateStmt = conn.prepareStatement(
+        "MERGE INTO sequence (name, `value`) " +
+          "KEY (name) " +
+          "VALUES (?, COALESCE((SELECT `value` FROM sequence WHERE name = ?) + 1, 1))"
+      );
+      checkAndUpdateStmt.setString(1, "user_code");
       checkAndUpdateStmt.setString(2, "user_code");
       checkAndUpdateStmt.executeUpdate();
 
-// Retrieve the updated sequence value
+      // Retrieve the updated sequence value
       selectStmt = conn.prepareStatement(
-        "SELECT value FROM sequence WHERE name = ?");
+        "SELECT `value` FROM sequence WHERE name = ?");
       selectStmt.setString(1, "user_code");
       rs = selectStmt.executeQuery();
       if (rs.next()) {
         randomNumber = rs.getInt(1);
-} else {
+      } else {
         throw new java.sql.SQLException("Failed to retrieve sequence value for: user_code");
-}
+      }
     } catch (java.sql.SQLException e) {
       e.printStackTrace();
       throw new RuntimeException("Failed to generate user code", e);
-} finally {
+    } finally {
       try {
         if (rs != null) rs.close();
         if (selectStmt != null) selectStmt.close();
         if (checkAndUpdateStmt != null) checkAndUpdateStmt.close();
         if (conn != null) conn.close();
-} catch (java.sql.SQLException e) {
+      } catch (java.sql.SQLException e) {
         e.printStackTrace();
         throw new RuntimeException("Failed to close resources", e);
-}
+      }
     }
     return randomNumber;
-}
+  }
 $$;
 
 CREATE TABLE `user`

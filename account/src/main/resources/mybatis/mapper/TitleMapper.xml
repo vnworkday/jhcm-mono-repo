@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="io.github.ntduycs.jhcm.account.domain.repository.TitleRepository">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO `title` (`code`, `name`, `description`, `status`,
+                         `created_at`, `created_by`, `updated_at`, `updated_by`, `version`)
+    VALUES (#{code}, #{name}, #{description}, #{status},
+            #{createdAt}, #{createdBy}, #{updatedAt}, #{updatedBy}, #{version})
+  </insert>
 
   <select id="findById" resultType="io.github.ntduycs.jhcm.account.domain.entity.Title">
     SELECT *
@@ -12,6 +18,12 @@
     SELECT *
     FROM `title`
     WHERE `code` = #{code}
+  </select>
+
+  <select id="findByName" resultType="io.github.ntduycs.jhcm.account.domain.entity.Title">
+    SELECT *
+    FROM `title`
+    WHERE `name` = #{name}
   </select>
 
   <select id="search" resultType="io.github.ntduycs.jhcm.account.domain.entity.Title">

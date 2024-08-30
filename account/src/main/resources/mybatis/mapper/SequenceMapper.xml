@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.github.ntduycs.jhcm.account.domain.repository.SequenceRepository">
+
+  <select id="getNextSequenceValue" parameterType="String" resultType="int">
+    select get_next_sequence_value(#{name})
+  </select>
+
+</mapper>
