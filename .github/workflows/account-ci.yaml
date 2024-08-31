@@ -38,7 +38,7 @@ jobs:
         if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' && (success() || failure()) }}
         with:
           name: Account-Service-Unit-Test-Results
-          path: "account/**/*-reports/TEST*.xml"
+          path: "account/target/surefire-reports/TEST*.xml"
           reporter: java-junit
 #      - name: Analyze with sonar cloud
 #        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' }}
