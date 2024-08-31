@@ -40,7 +40,21 @@ jobs:
           name: Account-Service-Unit-Test-Results
           path: "account/target/surefire-reports/TEST*.xml"
           reporter: java-junit
-#      - name: Analyze with sonar cloud
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Account Service Test Report
+          path: account/target/surefire-reports/TEST*.xml
+          if-no-files-found: error
+          retention-days: 1
+          overwrite: true
+      - name: Add test report to PR
+        uses: turing85/publish-report@v2
+        with:
+          download-artifact-name: 'Account Service Test Report'
+          checkout: true
+          report-path: '**/target/surefire-reports/TEST*.xml'
+      #      - name: Analyze with sonar cloud
 #        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' }}
 #        env:
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -54,9 +68,9 @@ jobs:
           path: '.'
           format: 'HTML'
       - name: Upload OWASP Dependency Check results
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v4
         with:
-          name: OWASP Dependency Check Report
+          name: Account OWASP Dependency Check Report
           path: ${{github.workspace}}/reports
       - name: Add coverage report to PR
         uses: madrapps/jacoco-report@v1.6.1
