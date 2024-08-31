@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - uses: ./.github/workflows/common
       - name: Run Maven Checkstyle
-        run: mvn spotless:check -f account
+        run: mvn spotless:check -f account -q
       - name: Run Maven Verify
         run: mvn clean verify -pl account -am
       - name: Test Results
@@ -40,20 +40,23 @@ jobs:
           name: Account-Service-Unit-Test-Results
           path: "account/target/surefire-reports/TEST*.xml"
           reporter: java-junit
-      - name: Upload Test Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: Account Service Test Report
-          path: account/target/surefire-reports/TEST*.xml
-          if-no-files-found: error
-          retention-days: 1
-          overwrite: true
+#      - name: Upload Test Report
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: Account Service Test Report
+#          path: account/target/surefire-reports/TEST*.xml
+#          if-no-files-found: error
+#          retention-days: 1
+#          overwrite: true
       - name: Add test report to PR
         uses: turing85/publish-report@v2
+        if: ${{ always() }}
         with:
-          download-artifact-name: 'Account Service Test Report'
-          checkout: true
+          recreate-comment: 'true'
+          report-name: 'Account Service Test'
           report-path: "account/target/surefire-reports/TEST*.xml"
+          report-fail-on-error: 'true'
+          report-reporter: 'java-junit'
       #      - name: Analyze with sonar cloud
 #        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' }}
 #        env:
