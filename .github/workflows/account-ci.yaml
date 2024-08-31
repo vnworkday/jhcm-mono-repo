@@ -32,15 +32,7 @@ jobs:
       - name: Run Maven Checkstyle
         run: mvn spotless:check -f account -q
       - name: Run Maven Verify
-        run: mvn clean verify -pl account -am
-#      - name: Upload Test Report
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: Account Service Test Report
-#          path: account/target/surefire-reports/TEST*.xml
-#          if-no-files-found: error
-#          retention-days: 1
-#          overwrite: true
+        run: mvn clean verify -pl account -am -q
       - name: Add test report to PR
         uses: turing85/publish-report@v2
         if: ${{ always() }}
@@ -53,7 +45,7 @@ jobs:
             <h3>🔄 Account Test Report for run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})</h3>
             <blockquote>Result will be posted here as they get available.</blockquote>
           comment-message-success: |
-            <h4>🥳 Test passed</h4>
+            <h3>🥳 Test passed</h3>
             
             | Passed | Failed | Skipped |
             | ------ | ------ | ------- |
@@ -61,7 +53,7 @@ jobs:
             
             You can see the full report [here]({4})
           comment-message-failure: |
-            <h4>😢 Test failed</h4>
+            <h3>😢 Test failed</h3>
             
             | Passed | Failed | Skipped |
             | ------ | ------ | ------- |
