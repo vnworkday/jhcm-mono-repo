@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
     paths:
       - "account/**"
+      - "base/**"
       - ".github/workflows/common/action.yaml"
       - ".github/workflows/account-ci.yaml"
       - "pom.xml"
@@ -12,6 +13,7 @@ on:
     branches: [ "main" ]
     paths:
       - "account/**"
+      - "base/**"
       - ".github/workflows/common/action.yaml"
       - ".github/workflows/account-ci.yaml"
       - "pom.xml"
@@ -28,16 +30,36 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - uses: ./.github/workflows/common
       - name: Run Maven Checkstyle
-        run: mvn spotless:check -f account
+        run: mvn spotless:check -f account -q
       - name: Run Maven Verify
-        run: mvn clean verify -f account
-      - name: Test Results
-        uses: dorny/test-reporter@v1
-        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' && (success() || failure()) }}
+        run: mvn clean verify -pl account -am -q
+      - name: Add test report to PR
+        uses: turing85/publish-report@v2
+        if: ${{ always() }}
         with:
-          name: Account-Service-Unit-Test-Results
-          path: "account/**/*-reports/TEST*.xml"
-          reporter: java-junit
+          report-name: 'Account Test'
+          report-path: "account/target/surefire-reports/TEST*.xml"
+          report-fail-on-error: 'true'
+          report-reporter: 'java-junit'
+          comment-message-recreate: |
+            <h3>🔄 Account Test Report for run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})</h3>
+            <blockquote>Result will be posted here as they get available.</blockquote>
+          comment-message-success: |
+            <h3>🥳 Test passed</h3>
+            
+            | Passed | Failed | Skipped |
+            | ------ | ------ | ------- |
+            | ✅ {1} | ❌ {2} | ⚠️ {3} |
+            
+            You can see the full report [here]({4})
+          comment-message-failure: |
+            <h3>😢 Test failed</h3>
+            
+            | Passed | Failed | Skipped |
+            | ------ | ------ | ------- |
+            | ✅ {1} | ❌ {2} | ⚠️ {3} |
+            
+            You can see the full report [here]({4})
 #      - name: Analyze with sonar cloud
 #        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' }}
 #        env:
@@ -52,9 +74,9 @@ jobs:
           path: '.'
           format: 'HTML'
       - name: Upload OWASP Dependency Check results
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v4
         with:
-          name: OWASP Dependency Check Report
+          name: Account OWASP Dependency Check Report
           path: ${{github.workspace}}/reports
       - name: Add coverage report to PR
         uses: madrapps/jacoco-report@v1.6.1
