@@ -65,7 +65,7 @@
   <sql id="orderSpecifier">
     <choose>
       <when test="request.sort != null and request.sort != '' and request.order != null and request.order != ''">
-        ${request.sort} ${request.order}
+        LOWER(REGEXP_REPLACE(#{request.sort}, '([A-Z])', '_\\1')) ${request.order}
       </when>
       <otherwise>
         `updated_at` DESC

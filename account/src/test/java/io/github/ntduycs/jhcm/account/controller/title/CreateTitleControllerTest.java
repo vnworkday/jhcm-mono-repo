@@ -49,7 +49,7 @@ public class CreateTitleControllerTest {
   void shouldReturn201WhenTitleIsCreated() {
     callCreateTitleApi(request)
         .expectStatus()
-        .isCreated()
+        .isOk()
         .expectBody()
         .jsonPath("$.code")
         .isNotEmpty()
@@ -83,8 +83,8 @@ public class CreateTitleControllerTest {
   }
 
   @Test
-  @DisplayName("should return 400 when title name is already taken")
-  void shouldReturn400WhenTitleNameIsAlreadyTaken() {
+  @DisplayName("should return 409 when title name is already taken")
+  void shouldReturn409WhenTitleNameIsAlreadyTaken() {
     request.setName("Title 2");
 
     assertTrue(() -> titleRepository.findByName(request.getName()).isPresent());

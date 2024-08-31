@@ -14,6 +14,8 @@ import org.springframework.aot.generate.Generated;
 @AnnotateWith(Generated.class)
 @Mapper(componentModel = "spring")
 public interface TitleMapper {
+  @Mapping(target = "updater", ignore = true)
+  @Mapping(target = "creator", ignore = true)
   GetTitleResponse fromTitleToGetResponse(Title title);
 
   ListTitleResponse.Item fromTitleToListResponse(Title title);

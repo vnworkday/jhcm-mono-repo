@@ -82,7 +82,7 @@ spring:
       on-profile: local
   datasource:
     main:
-      url: jdbc:mysql://localhost:3306/j_account?useSSL=false
+      url: jdbc:mysql://localhost:3306/j_account?useSSL=false&allowPublicKeyRetrieval=true
       username: root
       password: root
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -92,13 +92,23 @@ spring:
       password: root
       driver-class-name: com.mysql.cj.jdbc.Driver
   quartz:
-    auto-startup: true
+    auto-startup: false
 logging:
   level:
     root: info
     io.github.ntduycs.jhcm: debug
 server:
   port: 9090
+http:
+  logging:
+    request:
+      include-headers: true
+    response:
+      include-headers: true
+springdoc:
+  default-produces-media-type: application/json
+  webjars:
+    prefix: /openapi
 ---
 spring:
   config:

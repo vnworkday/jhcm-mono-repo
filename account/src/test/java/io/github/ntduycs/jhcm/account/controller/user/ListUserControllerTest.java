@@ -125,6 +125,8 @@ public class ListUserControllerTest {
     request.setSort("username");
     request.setOrder("desc");
 
+    users.sort((a, b) -> b.getUsername().compareTo(a.getUsername()));
+
     callListUsersApi(request)
         .expectStatus()
         .isOk()
