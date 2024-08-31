@@ -33,13 +33,6 @@ jobs:
         run: mvn spotless:check -f account -q
       - name: Run Maven Verify
         run: mvn clean verify -pl account -am
-      - name: Test Results
-        uses: dorny/test-reporter@v1
-        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' && (success() || failure()) }}
-        with:
-          name: Account-Service-Unit-Test-Results
-          path: "account/target/surefire-reports/TEST*.xml"
-          reporter: java-junit
 #      - name: Upload Test Report
 #        uses: actions/upload-artifact@v4
 #        with:
@@ -56,7 +49,26 @@ jobs:
           report-path: "account/target/surefire-reports/TEST*.xml"
           report-fail-on-error: 'true'
           report-reporter: 'java-junit'
-      #      - name: Analyze with sonar cloud
+          comment-message-recreate: |
+            <h3>🔄 Account Test Report for run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})</h3>
+            <blockquote>Result will be posted here as they get available.</blockquote>
+          comment-message-success: |
+            <h4>🥳 Test passed</h4>
+            
+            | Passed | Failed | Skipped |
+            | ------ | ------ | ------- |
+            | ✅ {1} | ❌ {2} | ⚠️ {3} |
+            
+            You can see the full report [here]({4})
+          comment-message-failure: |
+            <h4>😢 Test failed</h4>
+            
+            | Passed | Failed | Skipped |
+            | ------ | ------ | ------- |
+            | ✅ {1} | ❌ {2} | ⚠️ {3} |
+            
+            You can see the full report [here]({4})
+#      - name: Analyze with sonar cloud
 #        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' }}
 #        env:
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
