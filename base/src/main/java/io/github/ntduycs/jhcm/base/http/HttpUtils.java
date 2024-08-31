@@ -1,8 +1,8 @@
 package io.github.ntduycs.jhcm.base.http;
 
-import lombok.NoArgsConstructor;
-
 import static lombok.AccessLevel.PRIVATE;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = PRIVATE)
 public final class HttpUtils {

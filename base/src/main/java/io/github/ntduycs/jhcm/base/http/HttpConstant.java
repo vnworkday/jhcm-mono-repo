@@ -11,6 +11,6 @@ public final class HttpConstant {
 
   public static final int HTTP_REQUEST_DEFAULT_OFFSET = 0;
   public static final int HTTP_REQUEST_DEFAULT_SIZE = 10;
-  public static final String HTTP_REQUEST_DEFAULT_SORT = "updated_at";
+  public static final String HTTP_REQUEST_DEFAULT_SORT = "updatedAt";
   public static final String HTTP_REQUEST_DEFAULT_ORDER = "desc";
 }

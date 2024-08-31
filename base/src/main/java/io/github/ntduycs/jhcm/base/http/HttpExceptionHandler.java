@@ -4,11 +4,13 @@ import io.github.ntduycs.jhcm.base.http.exception.HttpErrorMapper;
 import io.github.ntduycs.jhcm.base.http.exception.HttpException;
 import io.github.ntduycs.jhcm.base.http.exception.model.ErrorResponse;
 import io.github.ntduycs.jhcm.base.http.exception.model.HttpError;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -105,16 +107,32 @@ public class HttpExceptionHandler extends ResponseEntityExceptionHandler {
 
     return Mono.just(
         new ResponseEntity<>(
-            new ErrorResponse(HttpError.NOT_FOUND, ex.getMessage()), HttpErrorMapper.fromError(HttpError.NOT_FOUND)));
+            new ErrorResponse(HttpError.NOT_FOUND, ex.getMessage()),
+            HttpErrorMapper.fromError(HttpError.NOT_FOUND)));
   }
 
-  @ExceptionHandler(DuplicateKeyException.class)
-  public Mono<ResponseEntity<ErrorResponse>> handleDuplicateKeyException(DuplicateKeyException ex) {
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public Mono<ResponseEntity<ErrorResponse>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
     logError(ex);
 
     return Mono.just(
         new ResponseEntity<>(
-            new ErrorResponse(HttpError.ALREADY_EXISTS, ex.getMessage()), HttpErrorMapper.fromError(HttpError.ALREADY_EXISTS)));
+            new ErrorResponse(HttpError.ALREADY_EXISTS, getExceptionMessage(ex)),
+            HttpErrorMapper.fromError(HttpError.ALREADY_EXISTS)));
+  }
+
+  @ExceptionHandler(SQLException.class)
+  public Mono<ResponseEntity<ErrorResponse>> handleSQLException(SQLException ex) {
+    logError(ex);
+
+    return Mono.just(
+        new ResponseEntity<>(
+            new ErrorResponse(HttpError.INTERNAL, ex.getMessage()),
+            HttpErrorMapper.fromError(HttpError.INTERNAL)));
+  }
+
+  private String getExceptionMessage(Exception ex) {
+    return Optional.ofNullable(ex.getCause()).map(Throwable::getMessage).orElse(ex.getMessage());
   }
 
   private void logError(Exception ex) {
@@ -125,8 +143,28 @@ public class HttpExceptionHandler extends ResponseEntityExceptionHandler {
     switch (ex.getClass().getSimpleName()) {
       case "TypeMismatchException" -> logTypeMismatchException((TypeMismatchException) ex);
       case "WebExchangeBindException" -> logWebExchangeBindException((WebExchangeBindException) ex);
+      case "JdbcSQLIntegrityConstraintViolationException",
+              "SQLIntegrityConstraintViolationException" ->
+          logSQLIntegrityConstraintViolationException(
+              (SQLIntegrityConstraintViolationException) ex);
+      case "HttpException" -> logHttpException((HttpException) ex);
       default -> logGeneralException(ex);
     }
+  }
+
+  private void logHttpException(HttpException ex) {
+    if (ex.getError().getCode() == HttpError.NOT_FOUND.getCode()) {
+      log.error("Found HttpException: {}", ex.getMessage());
+    } else {
+      logGeneralException(ex);
+    }
+  }
+
+  private void logSQLIntegrityConstraintViolationException(
+      SQLIntegrityConstraintViolationException ex) {
+    log.error(
+        "Found SQLIntegrityConstraintViolationException: {}",
+        Optional.ofNullable(ex.getMessage()).orElse("Unknown"));
   }
 
   private void logTypeMismatchException(TypeMismatchException ex) {

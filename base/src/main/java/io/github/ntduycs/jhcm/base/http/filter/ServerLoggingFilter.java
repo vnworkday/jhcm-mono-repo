@@ -1,7 +1,6 @@
 package io.github.ntduycs.jhcm.base.http.filter;
 
-import static io.github.ntduycs.jhcm.base.logging.LoggingConstant.CORRELATION_ID;
-import static io.github.ntduycs.jhcm.base.logging.LoggingConstant.REQUEST_ID;
+import static io.github.ntduycs.jhcm.base.logging.LoggingConstant.*;
 
 import io.github.ntduycs.jhcm.base.http.HttpConstant;
 import io.github.ntduycs.jhcm.base.http.HttpProperties;
@@ -44,7 +43,9 @@ public class ServerLoggingFilter implements WebFilter {
       return chain.filter(exchange);
     }
 
-    return chain.filter(new LoggingDecorator(exchange, properties, startTime));
+    return chain
+        .filter(new LoggingDecorator(exchange, properties, startTime))
+        .doFinally(signal -> MDC.clear());
   }
 
   private void setMDCRequest(ServerWebExchange exchange) {
@@ -57,6 +58,12 @@ public class ServerLoggingFilter implements WebFilter {
         CORRELATION_ID,
         Optional.ofNullable(correlationId)
             .orElse(ObjectUtils.getIdentityHexString(exchange.getRequest())));
+
+    var method = exchange.getRequest().getMethod();
+    MDC.put(METHOD, method.name());
+
+    var path = exchange.getRequest().getURI().getPath();
+    MDC.put(PATH, path);
   }
 
   static class LoggingDecorator extends ServerWebExchangeDecorator {
