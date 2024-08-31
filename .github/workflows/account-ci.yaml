@@ -5,14 +5,14 @@ on:
     branches: [ "main" ]
     paths:
       - "account/**"
-      - ".github/workflows/actions/action.yaml"
+      - ".github/workflows/common/action.yaml"
       - ".github/workflows/account-ci.yaml"
       - "pom.xml"
   pull_request:
     branches: [ "main" ]
     paths:
       - "account/**"
-      - ".github/workflows/actions/action.yaml"
+      - ".github/workflows/common/action.yaml"
       - ".github/workflows/account-ci.yaml"
       - "pom.xml"
   workflow_dispatch:
