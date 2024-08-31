@@ -112,7 +112,8 @@ public class HttpExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public Mono<ResponseEntity<ErrorResponse>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+  public Mono<ResponseEntity<ErrorResponse>> handleDataIntegrityViolationException(
+      DataIntegrityViolationException ex) {
     logError(ex);
 
     return Mono.just(
