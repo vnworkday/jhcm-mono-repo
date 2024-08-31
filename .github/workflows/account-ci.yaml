@@ -53,7 +53,7 @@ jobs:
         with:
           download-artifact-name: 'Account Service Test Report'
           checkout: true
-          report-path: '**/target/surefire-reports/TEST*.xml'
+          report-path: "account/target/surefire-reports/TEST*.xml"
       #      - name: Analyze with sonar cloud
 #        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' }}
 #        env:
