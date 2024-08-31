@@ -52,8 +52,7 @@ jobs:
         uses: turing85/publish-report@v2
         if: ${{ always() }}
         with:
-          recreate-comment: 'true'
-          report-name: 'Account Service Test'
+          report-name: 'Account Test'
           report-path: "account/target/surefire-reports/TEST*.xml"
           report-fail-on-error: 'true'
           report-reporter: 'java-junit'
