@@ -68,7 +68,11 @@ public class TitleController {
         @ApiResponse(
             responseCode = "200",
             description = "Title created",
-            content = @Content(schema = @Schema(implementation = CreateTitleResponse.class)))
+            content = @Content(schema = @Schema(implementation = CreateTitleResponse.class))),
+        @ApiResponse(
+            responseCode = "409",
+            description = "Title already exists with the same name",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
       })
   public Mono<ResponseEntity<CreateTitleResponse>> createTitle(
       @Valid @RequestBody CreateTitleRequest request) {
