@@ -32,7 +32,7 @@ jobs:
       - name: Run Maven Checkstyle
         run: mvn spotless:check -f account
       - name: Run Maven Verify
-        run: mvn clean verify -f account
+        run: mvn clean verify -pl account -am
       - name: Test Results
         uses: dorny/test-reporter@v1
         if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' && (success() || failure()) }}
