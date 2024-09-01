@@ -101,4 +101,4 @@ jobs:
         with:
           context: ./account
           push: true
-          tags: ghcr.io/ntduycs/jhcm-account:latest
+          tags: ghcr.io/vnworkday/jhcm-account:latest
