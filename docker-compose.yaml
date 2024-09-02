@@ -1,0 +1,5 @@
+services:
+  account:
+    image: account:latest
+    ports:
+      - "29090:9090"
