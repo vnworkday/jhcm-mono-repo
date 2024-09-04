@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: keycloak
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: jhcm-keycloak:1.0.0
+          args: ["start", "--optimized"]
+          envFrom:
+            - configMapRef:
+                name: keycloak-configmap
+            - secretRef:
+                name: keycloak-secret
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9000
+            initialDelaySeconds: 20
+            periodSeconds: 3
+            failureThreshold: 3
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
