@@ -23,9 +23,6 @@ import reactor.core.publisher.Mono;
 public class TitleController {
   private final TitleService titleService;
 
-  @Value("${http.base-url}")
-  private String baseUrl;
-
   @GetMapping("/{code}")
   @Operation(
       summary = "Get title by code",

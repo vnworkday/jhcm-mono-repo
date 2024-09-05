@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{service}}
+  namespace: jhcm
+  labels:
+    app: {{service}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{service}}
+  template:
+    metadata:
+      labels:
+        app: {{service}}
+    spec:
+      containers:
+        - name: {{service}}
+          image: ghcr.io/vnworkday/jhcm-{{service}}:na
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: {{service}}-configmap
+            - secretRef:
+                name: {{service}}-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10 # you might want to adjust this value based on your application's startup time
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10 # you might want to adjust this value based on your application's startup time
+            periodSeconds: 5
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "0.5"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
