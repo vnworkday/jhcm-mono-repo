@@ -21,23 +21,20 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - uses: ./.github/workflows/common
       - name: Run Maven Package
-        if: ${{ github.event_name == 'pull_request' }}
-        run: mvn clean package -pl account -am -q -DskipTests
+        run: mvn clean install -pl account -am -q -DskipTests
       - name: Log in to the Container registry
         uses: docker/login-action@v3
-        if: ${{ github.event_name == 'push' }}
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Calculate short SHA
-        if: ${{ github.event_name == 'push' }}
         run: |
           shortSha=$(git rev-parse --short ${{ github.sha }})
+          echo "Short SHA: $shortSha"
           echo "SHORT_SHA=$shortSha" >> $GITHUB_ENV
       - name: Build and push Docker images
         uses: docker/build-push-action@v6
-        if: ${{ github.event_name == 'push' }}
         env:
           IMAGE_NAME: ghcr.io/vnworkday/jhcm-account
           IMAGE_TAG: ${{ env.SHORT_SHA }}
