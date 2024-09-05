@@ -17,13 +17,16 @@ on:
       - ".github/workflows/common/action.yaml"
       - ".github/workflows/account-ci.yaml"
       - "pom.xml"
+    types:
+      - opened
+      - reopened
+      - synchronize
   workflow_dispatch:
 
 jobs:
-  Build:
+  Lint:
     runs-on: ubuntu-latest
-    env:
-      FROM_ORIGINAL_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.ref == 'refs/heads/main' }}
+    if: ${{ github.event.pull_request.merged == false }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,6 +34,14 @@ jobs:
       - uses: ./.github/workflows/common
       - name: Run Maven Checkstyle
         run: mvn spotless:check -f account -q
+  Build:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.merged == false }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: ./.github/workflows/common
       - name: Run Maven Verify
         run: mvn clean verify -pl account -am -q
       - name: Add test report to PR
@@ -41,11 +52,8 @@ jobs:
           report-path: "account/target/surefire-reports/TEST*.xml"
           report-fail-on-error: 'true'
           report-reporter: 'java-junit'
-          comment-message-recreate: |
-            <h3>🔄 Account Test Report for run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})</h3>
-            <blockquote>Result will be posted here as they get available.</blockquote>
           comment-message-success: |
-            <h3>🥳 Test passed</h3>
+            <h3>🥳 Test passed for run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) at $(date +'%Y-%m-%dT%H:%M:%S')</h3>
             
             | Passed | Failed | Skipped |
             | ------ | ------ | ------- |
@@ -53,7 +61,7 @@ jobs:
             
             You can see the full report [here]({4})
           comment-message-failure: |
-            <h3>😢 Test failed</h3>
+            <h3>😢 Test failed for run [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) at $(date +'%Y-%m-%dT%H:%M:%S')</h3>
             
             | Passed | Failed | Skipped |
             | ------ | ------ | ------- |
@@ -80,25 +88,37 @@ jobs:
           path: ${{github.workspace}}/reports
       - name: Add coverage report to PR
         uses: madrapps/jacoco-report@v1.6.1
-        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' }}
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           paths: ${{github.workspace}}/account/target/site/jacoco/jacoco.xml
           token: ${{secrets.GITHUB_TOKEN}}
-          min-coverage-overall: 80
-          min-coverage-changed-files: 70
-          title: 'Account Coverage Report'
+          min-coverage-overall: 90
+          min-coverage-changed-files: 90
+          title: 'Coverage Report'
           update-comment: true
+  Publish:
+    runs-on: ubuntu-latest
+    needs:
+      - Lint
+      - Build
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: ./.github/workflows/common
       - name: Log in to the Container registry
-        if: ${{ github.ref == 'refs/heads/main' }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push Docker images
-        if: ${{ github.ref == 'refs/heads/main' }}
         uses: docker/build-push-action@v6
+        env:
+          IMAGE_NAME: ghcr.io/vnworkday/jhcm-account
+          IMAGE_TAG: $(git rev-parse --short ${{ github.sha }})
         with:
           context: ./account
           push: true
-          tags: ghcr.io/vnworkday/jhcm-account:latest
+          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
