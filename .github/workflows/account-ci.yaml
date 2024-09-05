@@ -36,13 +36,13 @@ jobs:
         run: mvn spotless:check -f account -q
   Build:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - uses: ./.github/workflows/common
       - name: Run Maven Verify
-        if: ${{ github.event_name == 'pull_request' }}
         run: mvn clean verify -pl account -am -q
       - name: Add test report to PR
         uses: turing85/publish-report@v2
@@ -68,14 +68,8 @@ jobs:
             | ✅ {1} | ❌ {2} | ⚠️ {3} |
             
             You can see the full report [here]({4})
-#      - name: Analyze with sonar cloud
-#        if: ${{ env.FROM_ORIGINAL_REPOSITORY == 'true' }}
-#        env:
-#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-#        run: mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -f account
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
-        if: ${{ github.event_name == 'pull_request' }}
         env:
           JAVA_HOME: /opt/jdk
         with:
@@ -84,13 +78,11 @@ jobs:
           format: 'HTML'
       - name: Upload OWASP Dependency Check results
         uses: actions/upload-artifact@v4
-        if: ${{ github.event_name == 'pull_request' }}
         with:
           name: Account OWASP Dependency Check Report
           path: ${{github.workspace}}/reports
       - name: Add coverage report to PR
         uses: madrapps/jacoco-report@v1.6.1
-        if: ${{ github.event_name == 'pull_request' }}
         with:
           paths: ${{github.workspace}}/account/target/site/jacoco/jacoco.xml
           token: ${{secrets.GITHUB_TOKEN}}
@@ -98,6 +90,17 @@ jobs:
           min-coverage-changed-files: 90
           title: 'Coverage Report'
           update-comment: true
+  Docker:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: ./.github/workflows/common
+      - name: Run Maven Package
+        if: ${{ github.event_name == 'pull_request' }}
+        run: mvn clean package -pl account -am -q -DskipTests
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         if: ${{ github.event_name == 'push' }}
@@ -108,7 +111,8 @@ jobs:
       - name: Calculate short SHA
         if: ${{ github.event_name == 'push' }}
         run: |
-          echo ::set-env name=SHORT_SHA::$(echo ${{ github.sha }} | cut -c1-7)
+          shortSha=$(git rev-parse --short ${{ github.sha }})
+          echo "SHORT_SHA=$shortSha" >> $GITHUB_ENV
       - name: Build and push Docker images
         uses: docker/build-push-action@v6
         if: ${{ github.event_name == 'push' }}
