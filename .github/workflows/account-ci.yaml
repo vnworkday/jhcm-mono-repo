@@ -1,14 +1,6 @@
-name: account service ci
+name: account service pr
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - "account/**"
-      - "base/**"
-      - ".github/workflows/common/action.yaml"
-      - ".github/workflows/account-ci.yaml"
-      - "pom.xml"
   pull_request:
     branches: [ "main" ]
     paths:
@@ -26,7 +18,6 @@ on:
 jobs:
   Lint:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,7 +27,6 @@ jobs:
         run: mvn spotless:check -f account -q
   Build:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,6 +58,29 @@ jobs:
             | ✅ {1} | ❌ {2} | ⚠️ {3} |
             
             You can see the full report [here]({4})
+  Coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: ./.github/workflows/common
+      - name: Add coverage report to PR
+        uses: madrapps/jacoco-report@v1.6.1
+        with:
+          paths: ${{github.workspace}}/account/target/site/jacoco/jacoco.xml
+          token: ${{secrets.GITHUB_TOKEN}}
+          min-coverage-overall: 90
+          min-coverage-changed-files: 90
+          title: 'Coverage Report'
+          update-comment: true
+  Dependency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: ./.github/workflows/common
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         env:
@@ -81,45 +94,3 @@ jobs:
         with:
           name: Account OWASP Dependency Check Report
           path: ${{github.workspace}}/reports
-      - name: Add coverage report to PR
-        uses: madrapps/jacoco-report@v1.6.1
-        with:
-          paths: ${{github.workspace}}/account/target/site/jacoco/jacoco.xml
-          token: ${{secrets.GITHUB_TOKEN}}
-          min-coverage-overall: 90
-          min-coverage-changed-files: 90
-          title: 'Coverage Report'
-          update-comment: true
-  Docker:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: ./.github/workflows/common
-      - name: Run Maven Package
-        if: ${{ github.event_name == 'pull_request' }}
-        run: mvn clean package -pl account -am -q -DskipTests
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        if: ${{ github.event_name == 'push' }}
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Calculate short SHA
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          shortSha=$(git rev-parse --short ${{ github.sha }})
-          echo "SHORT_SHA=$shortSha" >> $GITHUB_ENV
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v6
-        if: ${{ github.event_name == 'push' }}
-        env:
-          IMAGE_NAME: ghcr.io/vnworkday/jhcm-account
-          IMAGE_TAG: ${{ env.SHORT_SHA }}
-        with:
-          context: ./account
-          push: true
-          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
