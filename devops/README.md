@@ -1,5 +1,16 @@
 # DevOps module
 
+## Configure your `/etc/hosts`
+
+Append the following entries to your `/etc/hosts` file (with `sudo` permission):
+
+```bash
+# other entries...
+127.0.0.1 argocd.jhcm.io
+127.0.0.1 keycloak.jhcm.io
+127.0.0.1 api.jhcm.io
+```
+
 ## Ingress Nginx
 
 Using the following command to bootstrap Ingress Nginx:
@@ -40,21 +51,29 @@ data:
 # other configurations
 ```
 
-Access to the ArgoCD UI at `http://argocd.jhcm.io` using the default credentials:
+Access to the ArgoCD UI console at [http://argocd.jhcm.io](http://argocd.jhcm.io) using the default credentials:
 
 - Username: `admin`
-- Password: `admin`
+- Password: obtained via the following command:
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+# or via `agocd` CLI, if you have it installed
+argocd admin initial-password -n argocd
+```
 
 ## Keycloak
 
 Using the following command to bootstrap Keycloak:
 
 ```bash
+# Build the customized Keycloak image locally
 docker build -t jhcm-keycloak:1.0.0 platform/keycloak
+# Deploy the Keycloak manifests
 kubectl apply -n keycloak -f platform/keycloak
 ```
 
-Access to the Keycloak UI at `http://keycloak.jhcm.io` using the default credentials:
+Access to the Keycloak UI console at [http://keycloak.jhcm.io](http://keycloak.jhcm.io) using the default credentials:
 
 - Username: `admin`
 - Password: `admin`
