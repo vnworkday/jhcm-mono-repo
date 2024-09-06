@@ -9,10 +9,6 @@ on:
       - ".github/workflows/common/action.yaml"
       - ".github/workflows/account-ci.yaml"
       - "pom.xml"
-    types:
-      - opened
-      - reopened
-      - synchronize
   workflow_dispatch:
 
 jobs:
