@@ -6,14 +6,16 @@ import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.listeners.JobListenerSupport;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@ConditionalOnMissingBean(name = "RetryJobListener")
 public class RetryJobListener extends JobListenerSupport {
   @Override
   public String getName() {
-    return "RetryListener";
+    return "RetryJobListener";
   }
 
   @Override
@@ -53,7 +55,7 @@ public class RetryJobListener extends JobListenerSupport {
                 SimpleScheduleBuilder.simpleSchedule()
                     .withRepeatCount(0) // One-shot trigger
                     .withMisfireHandlingInstructionFireNow())
-            .startAt(calculateRetryStartTime(trigger, currentRetries))
+            .startAt(calculateRetryStartTime(currentRetries))
             .modifiedByCalendar(trigger.getCalendarName())
             .build();
 
@@ -77,7 +79,7 @@ public class RetryJobListener extends JobListenerSupport {
    * Calculate the scheduled start time to retry the job. The time is calculated using backoff
    * strategy with a base delay of 3 second.
    */
-  private Date calculateRetryStartTime(Trigger trigger, int currentRetries) {
+  private Date calculateRetryStartTime(int currentRetries) {
     return Date.from(Instant.now().plusSeconds(3L * (currentRetries + 1)));
   }
 }

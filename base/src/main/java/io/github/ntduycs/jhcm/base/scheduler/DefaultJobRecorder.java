@@ -1,12 +1,16 @@
 package io.github.ntduycs.jhcm.base.scheduler;
 
 import io.github.ntduycs.jhcm.base.util.JsonUtils;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class DefaultJobRecorder implements JobRecorder {
+@ConditionalOnMissingBean(JobRecorder.class)
+public class DefaultJobRecorder implements JobRecorder, InitializingBean {
   @Override
   public void recordNew(JobRecord jobRecord) {
     log.info("Recording new job: {}", JsonUtils.stringify(jobRecord));
@@ -18,10 +22,14 @@ public class DefaultJobRecorder implements JobRecorder {
   }
 
   @Override
-  public JobRecord get(String fireInstanceId) {
-    log.warn(
-        "Cannot get job record. Consider to implement JobRecorder instead of using DefaultJobRecorder");
+  public Optional<JobRecord> get(String fireInstanceId) {
+    log.warn("Cannot get job record. Consider to implement JobRecorder for persistent storage");
 
-    return new JobRecord().setFireInstanceId(fireInstanceId);
+    return Optional.empty();
+  }
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    log.warn("Using DefaultJobRecorder. Consider to implement JobRecorder for persistent storage");
   }
 }

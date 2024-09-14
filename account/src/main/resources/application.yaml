@@ -128,7 +128,7 @@ spring:
     locations: classpath:db/h2
 logging:
   level:
-    root: info
-    io.github.ntduycs.jhcm: debug
+    root: warn
+    io.github.ntduycs.jhcm: warn
 keycloak:
   enabled: false

@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum ChangeStatus {
-  WAITING("W"),
+  PENDING("P"),
   APPROVED("A"),
   REJECTED("R");
 

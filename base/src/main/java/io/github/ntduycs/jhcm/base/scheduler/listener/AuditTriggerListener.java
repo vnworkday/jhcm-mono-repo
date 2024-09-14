@@ -28,15 +28,16 @@ public class AuditTriggerListener extends TriggerListenerSupport {
       Trigger trigger,
       JobExecutionContext context,
       Trigger.CompletedExecutionInstruction instructionCode) {
-    var jobRecord =
-        jobRecorder
-            .get(context.getFireInstanceId())
-            .setJobRunTime(context.getJobRunTime())
-            .setJobResult(context.getResult())
-            .setCompleteInstruction(instructionCode.name())
-            .setModifiedAt(Instant.now());
-
-    jobRecorder.recordComplete(jobRecord);
+    jobRecorder
+        .get(context.getFireInstanceId())
+        .ifPresent(
+            record -> {
+              record
+                  .setJobResult(context.getResult())
+                  .setCompleteInstruction(instructionCode.name())
+                  .setModifiedAt(Instant.now());
+              jobRecorder.recordComplete(record);
+            });
   }
 
   @Override
