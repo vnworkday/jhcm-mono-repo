@@ -1,5 +1,15 @@
 # DevOps module
 
+## Install Helm
+
+Please follow the official [Helm installation guide](https://helm.sh/docs/intro/install/).
+
+Verify your installation by running the following command:
+
+```bash
+helm version
+```
+
 ## Configure your `/etc/hosts`
 
 Append the following entries to your `/etc/hosts` file (with `sudo` permission):

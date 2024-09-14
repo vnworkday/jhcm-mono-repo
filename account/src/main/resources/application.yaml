@@ -40,7 +40,7 @@ management:
     build.enabled: true
     git.enabled: true
   endpoints.web.exposure.include: health, info
-  endpoint.health.show-details: never
+  endpoint.health.show-details: always
   tracing:
     baggage:
       correlation:

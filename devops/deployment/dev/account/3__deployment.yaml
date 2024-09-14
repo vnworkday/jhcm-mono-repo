@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: account
-          image: ghcr.io/vnworkday/jhcm-account:na
+          image: ghcr.io/vnworkday/jhcm-account:311d43e
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
@@ -26,20 +26,20 @@ spec:
                 name: account-secret
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path: /account/actuator/health
               port: 8080
-            initialDelaySeconds: 10 # you might want to adjust this value based on your application's startup time
+            initialDelaySeconds: 20 # you might want to adjust this value based on your application's startup time
             periodSeconds: 5
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /account/actuator/health
               port: 8080
-            initialDelaySeconds: 10 # you might want to adjust this value based on your application's startup time
+            initialDelaySeconds: 20 # you might want to adjust this value based on your application's startup time
             periodSeconds: 5
           resources:
             limits:
               memory: 512Mi
-              cpu: "0.5"
+              cpu: "1"
             requests:
-              memory: 256Mi
-              cpu: "0.2"
+              memory: 512Mi
+              cpu: "1"
